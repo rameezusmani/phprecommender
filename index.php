@@ -9,8 +9,8 @@ use UglyRecommender\RecommenderSystem;
 
 //using movielens data set ratings.csv
 //we will predict what rating a user will give to a movie
-$userId="274"; //user id to use for prediction
-$movieId="59315"; //movie id to use for prediction
+$userId="1"; //user id to use for prediction
+$movieId="110"; //movie id to use for prediction
 //our data matrix
 //we will construct php array from ratings.csv in following format
 //array("274"=>array("59315"=>3.5))
@@ -23,8 +23,11 @@ $fp=fopen("ratings.csv","r");
 fgetcsv($fp);
 while(($row=fgetcsv($fp))!==FALSE){
     $mkey="".$row[1]."";
-    if (!isset($movieIds[$mkey]))
-        $movieIds[$mkey]="1";
+    //if (!isset($movieIds[$mkey]))
+        //$movieIds[$mkey]="1";
+    if (!in_array($mkey,$movieIds)){
+        $movieIds[]=$mkey;
+    }
 }
 fclose($fp);
 
@@ -60,9 +63,10 @@ foreach ($keys as $k){
 }
 //set 0 for all movies that are not rated by this user
 $keys=array_keys($dataMatrix);
-$mkeys=array_keys($movieIds);
+//$mkeys=array_keys($movieIds);
 foreach ($keys as $k){
-    foreach ($mkeys as $mid){
+    //foreach ($mkeys as $mid){
+    foreach($movieIds as $mid){
         if (!isset($dataMatrix[$k][$mid])){
             $dataMatrix[$k][$mid]=0;
         }
@@ -74,19 +78,23 @@ foreach ($keys as $k){
 try{
     $recommender=new RecommenderSystem();
     $recommender->setDataMatrix($dataMatrix);
+    $recommender->setUnknownValue(0); //this tells recommender system that 0 is considered as unknown value
     //set cosine of angle as distance calculation method
-    $recommender->setDistanceMethod("cosine");
+    //$recommender->setDistanceMethod("cosine");
     //set euclidean as distance calculation method
     //$recommender->setDistanceMethod("euclidean");
     //set manhattan as distance calculation method
-    //$recommender->setDistanceMethod("manhattan");
+    $recommender->setDistanceMethod("manhattan");
     //how to get neighbors sorted by distance
     //$neighbors=$recommender->getOrderedNeighbors("3",5,"asc"); //asc=ascending order of distance
     //$neighbors=$recommender->getOrderedNeighbors("3",5,"desc"); //desc=descending order of distance
-    echo "Value Prediction<br />";
-    $value=$recommender->predictValue($userId,$movieId);
-    echo $userId." is predicted to rate ".$movieId.": ".$value;
-    echo "<br />";
+    //echo "Value Prediction<br />";
+    //$value=$recommender->predictValue($userId,$movieId,100);
+    //echo $userId." is predicted to rate ".$movieId.": ".$value;
+    //echo "<br />";
+    echo "Recommendations<br />";
+    $rms=$recommender->getRecommendations($userId);
+    print_r($rms);
 }catch(VectorsUnequalException $ex){
     echo "VectorsUnequalException: ".$ex->getMessage();
 }catch(NeighborsNotFoundException $ex){

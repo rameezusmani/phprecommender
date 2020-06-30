@@ -10,9 +10,15 @@ class RecommenderSystem {
     private $dataMatrix=array();
     private $useWeightedDistance=false;
     private $distanceMethod="cosine";
+    private $unknownValue=0;
 
     public function setDataMatrix($dMatrix){
         $this->dataMatrix=$dMatrix;
+    }
+
+    public function pivotDataMatrix(){
+        //change rows to columns and columns to rows
+        $newMatrix=array();
     }
 
     public function setWeightedDistance($wd){
@@ -21,6 +27,10 @@ class RecommenderSystem {
 
     public function setDistanceMethod($m){
         $this->distanceMethod=$m;
+    }
+
+    public function setUnknownValue($v){
+        $this->unknownValue=$v;
     }
 
     private function buildVectorFromDataMatrix($key){
@@ -36,7 +46,7 @@ class RecommenderSystem {
         return $neighbor;
     }
 
-    public function getNeighborsWithDistance($subjectKey,$max_count=-1){
+    public function getNeighborsWithDistance($subjectKey,$itemKey="",$max_count=-1){
         if (!isset($this->dataMatrix[$subjectKey])){
             //subject is not in matrix
             throw new SubjectNotFoundException("Subject with key ".$subjectKey." not in dataMatrix");
@@ -49,6 +59,9 @@ class RecommenderSystem {
             if ($max_count!=-1 && count($neighbors)==$max_count)
                 break;
             if ($k==$subjectKey){
+                continue;
+            }
+            if ($itemKey!="" && $this->dataMatrix[$k][$itemKey]==$this->unknownValue){
                 continue;
             }
             $distance=0;
@@ -69,11 +82,11 @@ class RecommenderSystem {
         return $neighbors;
     }
 
-    public function getOrderedNeighbors($subjectKey,$count=5,$order_sort="asc"){
+    public function getOrderedNeighbors($subjectKey,$itemKey="",$count=5,$order_sort="asc"){
         if ($count<=0){
             throw new Exception("count must be > 0");
         }
-        $neighbors=$this->getNeighborsWithDistance($subjectKey);
+        $neighbors=$this->getNeighborsWithDistance($subjectKey,$itemKey);
         if ($order_sort=="asc"){
             usort($neighbors,function($a,$b){
                 if($a['distance']==$b['distance']){ return 0 ; } 
@@ -85,13 +98,15 @@ class RecommenderSystem {
                 return ($a['distance'] > $b['distance']) ? -1 : 1;
             });
         }
-        array_splice($neighbors,$count);
+        if ($count>0){
+            array_splice($neighbors,$count);
+        }
         return $neighbors;
     }
 
-    public function predictValue($subjectKey,$itemKey,$max_count=5){
-        $neighbors_count=$max_count;
-        $neighbors=$this->getOrderedNeighbors($subjectKey,$max_count);
+    public function predictValue($subjectKey,$itemKey,$max_neighbors=5){
+        $neighbors_count=$max_neighbors;
+        $neighbors=$this->getOrderedNeighbors($subjectKey,$itemKey,$max_neighbors);
         $value=0;
         if (count($neighbors)<=0){
             throw new NeighborsNotFoundException("No neighbors found");
@@ -110,7 +125,49 @@ class RecommenderSystem {
         unset($neighbors);
         return $value;
     }
-    
+
+    public function getRecommendations($subjectKey,$max_neighbors=5,$max_count=5){
+        $neighbors_count=$max_neighbors;
+        $neighbors=$this->getOrderedNeighbors($subjectKey,"",$max_neighbors);
+        if (count($neighbors)<=0){
+            throw new NeighborsNotFoundException("No neighbors found");
+        }
+        if (count($neighbors)<$neighbors_count){
+            $neighbors_count=count($neighbors);
+        }
+        $recommendations=array();
+        $rated_movies=array();
+        foreach ($neighbors as $n){
+            $items=$this->dataMatrix[$n["key"]];
+            //remove items that $subjectKey has already rated
+            $keys=array_keys($items);
+            foreach($keys as $k){
+                if ($this->dataMatrix[$subjectKey][$k]!=$this->unknownValue){
+                    unset($items[$k]);
+                }
+            }
+            $keys=array_keys($items);
+            foreach($keys as $k){
+                if (floatval($items[$k])!=$this->unknownValue){
+                    if (!isset($rated_movies[$k])){
+                        $rated_movies[$k]=array("value"=>0,"count"=>0,"key"=>$k);
+                    }
+                    $rated_movies[$k]["value"]+=floatval($items[$k]);
+                    $rated_movies[$k]["count"]+=1;
+                }
+            }
+        }
+        usort($rated_movies,function($a,$b){
+            if($a['value']==$b['value']){ return 0 ; } 
+            return ($a['value'] > $b['value']) ? -1 : 1;
+        });
+        foreach ($rated_movies as $r){
+            $r['value']=floatval($r['value']/$r['count']);
+            $recommendations[]=$r;
+        }
+        array_splice($recommendations,$max_count);
+        return $recommendations;
+    }
 }
 
 
