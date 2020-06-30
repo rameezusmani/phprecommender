@@ -12,5 +12,7 @@ PHP based recommender system that can be used to predict values or find similar 
 
 ### Future updates
 - Feature to add weights to each value
+- Adding Error calculation methods
+- Adjust weights depending on error value
 - Include hamming distance to use string based data
 - Matrix factorization
