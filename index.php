@@ -7,14 +7,11 @@ use UglyRecommender\VectorsUnequalException;
 use UglyRecommender\NeighborsNotFoundException;
 use UglyRecommender\RecommenderSystem;
 
-//using movielens data set ratings.csv
-//we will predict what rating a user will give to a movie
-$userId="1"; //user id to use for prediction
-$movieId="110"; //movie id to use for prediction
-//our data matrix
+//STEP#1: LOAD DATASET
 //we will construct php array from ratings.csv in following format
 //array("274"=>array("59315"=>3.5))
-//274=userid,59315=movieid,3.5=rating given to movieid 59315 by userid 274
+//FOR USER BASED COLLABORATIVE FILTERING 274=userid,59315=movieid,3.5=rating given to movieid 59315 by userid 274
+//FOR ITEM BASED COLLABORATIVE FILTERING 274=movieid,59315=userid,3.5=rating given 
 $dataMatrix=array();
 $movieIds=array(); //unique ids of movies that are rated
 //load ratings csv file
@@ -51,16 +48,26 @@ while(($row=fgetcsv($fp))!==FALSE){
     $dataMatrix[$matrixKey][$objectKey]=floatval($row[2]);
 }
 fclose($fp);
+
+//EXAMPLE#1: GETTING MOVIE RECOMMENDATONS FOR USER
+//userId="1"
+
+//using movielens data set ratings.csv
+//we will predict what rating a user will give to a movie
+$userId="1"; //user id to use for prediction
+$movieId="110"; //movie id to use for prediction
+//our data matrix
+
 //now we have $dataMatrix array setup in the format we wanted
 //now we will remove unwanted users from $dataMatrix. In this case any user that has not rated movieid=59315
 //will be removed
-$keys=array_keys($dataMatrix);
+/*$keys=array_keys($dataMatrix);
 foreach ($keys as $k){
     if (!isset($dataMatrix[$k][$movieId])){
         unset($dataMatrix[$k]);
         //echo $k." has not rated ".$movieId."<br />";
     }
-}
+}*/
 //set 0 for all movies that are not rated by this user
 $keys=array_keys($dataMatrix);
 //$mkeys=array_keys($movieIds);
@@ -78,13 +85,19 @@ foreach ($keys as $k){
 try{
     $recommender=new RecommenderSystem();
     $recommender->setDataMatrix($dataMatrix);
-    $recommender->setUnknownValue(0); //this tells recommender system that 0 is considered as unknown value
+    $recommender->pivotDataMatrix();
+    //print_r($mtr);
+    //echo "Pivoted<br />";
+    //$dm=$recommender->getDataMatrix();
+    //print_r($dm["1"]);
+    
+    //$recommender->setUnknownValue(0); //this tells recommender system that 0 is considered as unknown value
     //set cosine of angle as distance calculation method
     //$recommender->setDistanceMethod("cosine");
     //set euclidean as distance calculation method
     //$recommender->setDistanceMethod("euclidean");
     //set manhattan as distance calculation method
-    $recommender->setDistanceMethod("manhattan");
+    //$recommender->setDistanceMethod("manhattan");
     //how to get neighbors sorted by distance
     //$neighbors=$recommender->getOrderedNeighbors("3",5,"asc"); //asc=ascending order of distance
     //$neighbors=$recommender->getOrderedNeighbors("3",5,"desc"); //desc=descending order of distance
@@ -92,9 +105,9 @@ try{
     //$value=$recommender->predictValue($userId,$movieId,100);
     //echo $userId." is predicted to rate ".$movieId.": ".$value;
     //echo "<br />";
-    echo "Recommendations<br />";
-    $rms=$recommender->getRecommendations($userId);
-    print_r($rms);
+    //echo "Recommendations<br />";
+    //$rms=$recommender->getRecommendations($userId);
+    //print_r($rms);
 }catch(VectorsUnequalException $ex){
     echo "VectorsUnequalException: ".$ex->getMessage();
 }catch(NeighborsNotFoundException $ex){

@@ -13,15 +13,38 @@ class RecommenderSystem {
     private $unknownValue=0;
 
     public function setDataMatrix($dMatrix){
+        unset($this->dataMatrix); //free memory for previous set datamatrix
         $this->dataMatrix=$dMatrix;
     }
 
-    public function pivotDataMatrix(){
-        //change rows to columns and columns to rows
-        $newMatrix=array();
+    public function getDataMatrix(){
+        return $this->dataMatrix;
     }
 
-    public function setWeightedDistance($wd){
+    public function pivotDataMatrix(){
+        $newMatrix=array();
+        $keys=array_keys($this->dataMatrix);
+        foreach ($keys as $k){
+            $items=$this->dataMatrix[$k];
+            $ikeys=array_keys($items);
+            foreach ($ikeys as $ik){
+                if (!isset($newMatrix[$ik])){
+                    $newMatrix[$ik]=array();
+                }
+                $val=floatval($this->dataMatrix[$k][$ik]);
+                unset($this->dataMatrix[$k][$ik]);
+                $newMatrix[$ik]["".$k.""]=$val;
+            }
+            unset($this->dataMatrix[$k]);
+            unset($ikeys);
+            unset($items);
+        }
+        unset($keys);
+        $this->dataMatrix=$newMatrix;
+        //return $newMatrix;
+    }
+
+    public function setUseWeightedDistance($wd){
         $this->useWeightedDistance=$wd;
     }
 
