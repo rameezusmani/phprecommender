@@ -12,6 +12,8 @@ PHP based recommender system that can be used to predict values, find similar it
 
 ## COMPLETE SET OF EXAMPLES USING MovieLens dataset ratings.csv
 
+#### include autoload.php and add use statements for classes
+
     include "src/autoload.php";
 
     use UglyRecommender\DistanceCalculator;
@@ -19,19 +21,21 @@ PHP based recommender system that can be used to predict values, find similar it
     use UglyRecommender\NeighborsNotFoundException;
     use UglyRecommender\RecommenderSystem;
 
-    //LOADING DATASET
-    //every dataset is different in format but our class RecommenderSystem expects data to be normalized
-    //in a specific format before it is passed to the class for operations
-    //we are using MovieLens dataset "ratings.csv" throughout for our examples
-    //each row in ratings.csv is in the format
-    //userid,movieid,rating_given
-    //we will construct php array from ratings.csv in following format
-    //FOR USER BASED COLLABORATIVE FILTERING each item of data matrix will be in the format:
-    //array("274"=>array("59315"=>3.5))
-    //274=userid,59315=movieid,3.5=rating given by userid 274 to movieid 59315 
-    //FOR ITEM BASED COLLABORATIVE FILTERING each item of data matrix will be in the format:
-    //array("59315"=>array("274"=>3.5))
-    //59315=movieid,274=userid,3.5=rating given to movieid 59315 by userid 274
+#### LOADING DATASET
+
+Every dataset is different in format but our class **RecommenderSystem** expects data to be normalized
+in a specific format before it is passed to the class for operations
+we are using MovieLens dataset "ratings.csv" throughout for our examples
+each row in ratings.csv is in the format
+userid,movieid,rating_given
+we will construct php array from ratings.csv in following format
+For **USER BASED COLLABORATIVE FILTERING** each item of data matrix will be in the format:
+array("274"=>array("59315"=>3.5))
+274=userid,59315=movieid,3.5=rating given by userid 274 to movieid 59315 
+For **ITEM BASED COLLABORATIVE FILTERING** each item of data matrix will be in the format:
+array("59315"=>array("274"=>3.5))
+59315=movieid,274=userid,3.5=rating given to movieid 59315 by userid 274
+
     $dataMatrix=array();
     //load ratings csv file
     $fp=fopen("ratings.csv","r");
@@ -79,7 +83,10 @@ PHP based recommender system that can be used to predict values, find similar it
     $recommender->setDataMatrix($dataMatrix);
     $recommender->setUnknownValue(0); //this tells RecommenderSystem that 0 is considered as unknown value
 
-    //TASK#1: GETTING MOVIE RECOMMENDATONS FOR USER "448"
+#### TASK#1: GET MOVIE RECOMMENDATONS FOR USER "448"
+
+##### USE COSINE SIMILARITY
+
     $recommender->setDistanceMethod("cosine"); //use cosine similarity
     //get recommendations for user "448".Maximum neighbors(similar users) to use=5,Maximum results to bring=5
     $recommendations=$recommender->getRecommendations("448",5,5);
@@ -89,6 +96,8 @@ PHP based recommender system that can be used to predict values, find similar it
         echo "MOVIEID: ".$r['key'].",EXPECTED RATING TO BE GIVEN BY USER: ".$r['value'];
         echo "<br />";
     }
+
+##### USE MANHATTAN DISTANCE
 
     $recommender->setDistanceMethod("manhattan"); //use manhattan distance
     //get recommendations for user "448".Maximum neighbors(similar users) to use=5,Maximum results to bring=5
@@ -100,13 +109,15 @@ PHP based recommender system that can be used to predict values, find similar it
         echo "<br />";
     }
 
-    //TASK#2: PREDICTING RATING TO BE GIVEN BY USER "448" to MOVIE "5"
+#### TASK#2: PREDICT RATING TO BE GIVEN BY USER "448" to MOVIE "5"
+    
     //use maximum 100 neighbors to predict
     $value=$recommender->predictValue("448","5",100);
     echo "<br />";
     echo "USER 448 IS PREDICTED TO GIVE ".$value." RATING TO MOVIE 5<br />";
 
-    //TASK#3: GET MAXIMUM 15 USERS SIMILAR TO USER 448
+#### TASK#3: GET MAXIMUM 15 USERS SIMILAR TO USER 448
+
     $recommender->setDistanceMethod("cosine"); //use cosine similarity
     $similar_users=$recommender->getOrderedNeighbors("448","",15,"asc");
     echo "<br />";
@@ -115,6 +126,7 @@ PHP based recommender system that can be used to predict values, find similar it
     foreach ($similar_users as $su){
         echo "USER ".$su['key']." HAS ".$su['distance']." SIMILARITY WITH USER 448<br />";
     }
+
 
 ### Future updates
 - Feature to add weights to each value
