@@ -79,8 +79,10 @@ For **ITEM BASED COLLABORATIVE FILTERING** each item of data matrix will be in t
         }  
     }  
     unset($movieIds);  
-    fclose($fp);  
-    //create instance of RecommenderSystem and set parameters  
+    fclose($fp);
+
+#### Create instance of RecommenderSystem and set parameters
+
     $recommender=new RecommenderSystem();  
     $recommender->setDataMatrix($dataMatrix);  
     $recommender->setUnknownValue(0); //this tells RecommenderSystem that 0 is considered as unknown value  
