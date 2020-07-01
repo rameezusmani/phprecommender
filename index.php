@@ -2,7 +2,6 @@
 
 include "src/autoload.php";
 
-use UglyRecommender\DistanceCalculator;
 use UglyRecommender\VectorsUnequalException;
 use UglyRecommender\NeighborsNotFoundException;
 use UglyRecommender\RecommenderSystem;
@@ -67,41 +66,50 @@ $recommender=new RecommenderSystem();
 $recommender->setDataMatrix($dataMatrix);
 $recommender->setUnknownValue(0); //this tells RecommenderSystem that 0 is considered as unknown value
 
-//TASK#1: GETTING MOVIE RECOMMENDATONS FOR USER "448"
-$recommender->setDistanceMethod("cosine"); //use cosine similarity
-//get recommendations for user "448".Maximum neighbors(similar users) to use=5,Maximum results to bring=5
-$recommendations=$recommender->getRecommendations("448",5,5);
-echo "<b>RECOMMENDATIONS FOR USER '448' USING <i>COSINE SIMILARITY</i></b><br />";
-echo count($recommendations)." RECOMMENDATIONS FOUND<br />";
-foreach ($recommendations as $r){
-    echo "MOVIEID: ".$r['key'].",EXPECTED RATING TO BE GIVEN BY USER: ".$r['value'];
-    echo "<br />";
-}
+// //TASK#1: GETTING MOVIE RECOMMENDATONS FOR USER "448"
+// $recommender->setDistanceMethod("cosine"); //use cosine similarity
+// //get recommendations for user "448".Maximum neighbors(similar users) to use=5,Maximum results to bring=5
+// $recommendations=$recommender->getRecommendations("448",5,5);
+// echo "<b>RECOMMENDATIONS FOR USER '448' USING <i>COSINE SIMILARITY</i></b><br />";
+// echo count($recommendations)." RECOMMENDATIONS FOUND<br />";
+// foreach ($recommendations as $r){
+//     echo "MOVIEID: ".$r['key'].",EXPECTED RATING TO BE GIVEN BY USER: ".$r['value'];
+//     echo "<br />";
+// }
 
-$recommender->setDistanceMethod("manhattan"); //use manhattan distance
-//get recommendations for user "448".Maximum neighbors(similar users) to use=5,Maximum results to bring=5
-$recommendations=$recommender->getRecommendations("448",5,5);
-echo "<b>RECOMMENDATIONS FOR USER '448' USING <i>MANHATTAN DISTANCE</i></b><br />";
-echo count($recommendations)." RECOMMENDATIONS FOUND<br />";
-foreach ($recommendations as $r){
-    echo "MOVIEID: ".$r['key'].",EXPECTED RATING TO BE GIVEN BY USER: ".$r['value'];
-    echo "<br />";
-}
+// $recommender->setDistanceMethod("manhattan"); //use manhattan distance
+// //get recommendations for user "448".Maximum neighbors(similar users) to use=5,Maximum results to bring=5
+// $recommendations=$recommender->getRecommendations("448",5,5);
+// echo "<b>RECOMMENDATIONS FOR USER '448' USING <i>MANHATTAN DISTANCE</i></b><br />";
+// echo count($recommendations)." RECOMMENDATIONS FOUND<br />";
+// foreach ($recommendations as $r){
+//     echo "MOVIEID: ".$r['key'].",EXPECTED RATING TO BE GIVEN BY USER: ".$r['value'];
+//     echo "<br />";
+// }
 
-//TASK#2: PREDICTING RATING TO BE GIVEN BY USER "448" to MOVIE "5"
-//use maximum 100 neighbors to predict
-$value=$recommender->predictValue("448","5",100);
+// //TASK#2: PREDICTING RATING TO BE GIVEN BY USER "448" to MOVIE "5"
+// //use maximum 100 neighbors to predict
+// $value=$recommender->predictValue("448","5",100);
+// echo "<br />";
+// echo "USER 448 IS PREDICTED TO GIVE ".$value." RATING TO MOVIE 5<br />";
+
+// //TASK#3: GET MAXIMUM 15 USERS SIMILAR TO USER 448
+// $recommender->setDistanceMethod("cosine"); //use cosine similarity
+// $similar_users=$recommender->getOrderedNeighbors("448","",15,"asc");
+// echo "<br />";
+// echo "<b>USERS SIMILAR TO USER 448</b><br />";
+// echo count($similar_users)." USERS SIMILAR TO USER 448<br />";
+// foreach ($similar_users as $su){
+//     echo "USER ".$su['key']." HAS ".$su['distance']." SIMILARITY WITH USER 448<br />";
+// }
+
+//TASK#4: TRANSPOSE OF DATA MATRIX
+$recommender->pivotDataMatrix();
 echo "<br />";
-echo "USER 448 IS PREDICTED TO GIVE ".$value." RATING TO MOVIE 5<br />";
-
-//TASK#3: GET MAXIMUM 15 USERS SIMILAR TO USER 448
-$recommender->setDistanceMethod("cosine"); //use cosine similarity
-$similar_users=$recommender->getOrderedNeighbors("448","",15,"asc");
-echo "<br />";
-echo "<b>USERS SIMILAR TO USER 448</b><br />";
-echo count($similar_users)." USERS SIMILAR TO USER 448<br />";
-foreach ($similar_users as $su){
-    echo "USER ".$su['key']." HAS ".$su['distance']." SIMILARITY WITH USER 448<br />";
+echo "DATA MATRIX TRANSPOSED<br />";
+$dm=$recommender->getDataMatrix();
+foreach ($dm as $v){
+    print_r($v);
+    break;
 }
-
 ?>

@@ -37,6 +37,7 @@ class RecommenderSystem {
             }
             unset($this->dataMatrix[$k]);
         }
+        unset($this->dataMatrix);
         unset($ikeys);
         unset($items);
         unset($keys);

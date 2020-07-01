@@ -6,6 +6,7 @@ $uglyRecommenderClassMap["UglyRecommender\\VectorsUnequalException"]="src/Vector
 $uglyRecommenderClassMap["UglyRecommender\\RecommenderSystem"]="src/RecommenderSystem.php";
 $uglyRecommenderClassMap["UglyRecommender\\SubjectNotFoundException"]="src/SubjectNotFoundException.php";
 $uglyRecommenderClassMap["UglyRecommender\\NeighborsNotFoundException"]="src/NeighborsNotFoundException.php";
+$uglyRecommenderClassMap["UglyRecommender\\DataHelper\\CsvLoadHelper"]="src/datahelper/CsvLoadHelper.php";
 
 spl_autoload_register(function($class_name) {
     global $uglyRecommenderClassMap;
