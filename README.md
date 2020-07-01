@@ -29,12 +29,14 @@ we are using MovieLens dataset "ratings.csv" throughout for our examples
 each row in ratings.csv is in the format
 userid,movieid,rating_given
 we will construct php array from ratings.csv in following format
+
 For **USER BASED COLLABORATIVE FILTERING** each item of data matrix will be in the format:
-array("274"=>array("59315"=>3.5))
-274=userid,59315=movieid,3.5=rating given by userid 274 to movieid 59315 
+- array("274"=>array("59315"=>3.5))
+- 274=userid,59315=movieid,3.5=rating given by userid 274 to movieid 59315 
+
 For **ITEM BASED COLLABORATIVE FILTERING** each item of data matrix will be in the format:
-array("59315"=>array("274"=>3.5))
-59315=movieid,274=userid,3.5=rating given to movieid 59315 by userid 274
+- array("59315"=>array("274"=>3.5))
+- 59315=movieid,274=userid,3.5=rating given to movieid 59315 by userid 274
 
     $dataMatrix=array();
     //load ratings csv file
