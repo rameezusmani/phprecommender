@@ -5,12 +5,12 @@ PHP based recommender system that can be used to predict values, find similar it
 
 ##### Please read index.php completely to understand how to use this recommender system in your code
 
-### DISTANCE CALCULATION METHODS
+### Distance calculation methods
 - Cosine of angle
 - Manhattan distance
 - Euclidean distance
 
-## COMPLETE SET OF EXAMPLES USING MovieLens dataset ratings.csv
+## Complete set of examples using MovieLens dataset **ratings.csv**
 
 #### include autoload.php and add use statements for classes
 
@@ -21,7 +21,7 @@ PHP based recommender system that can be used to predict values, find similar it
     use UglyRecommender\NeighborsNotFoundException;
     use UglyRecommender\RecommenderSystem;
 
-#### LOADING DATASET
+#### Loading Dataset
 
 Every dataset is different in format but our class **RecommenderSystem** expects data to be normalized
 in a specific format before it is passed to the class for operations
@@ -31,12 +31,16 @@ userid,movieid,rating_given
 we will construct php array from ratings.csv in following format
 
 For **USER BASED COLLABORATIVE FILTERING** each item of data matrix will be in the format:
-- array("274"=>array("59315"=>3.5))
-- 274=userid,59315=movieid,3.5=rating given by userid 274 to movieid 59315 
+
+    array("274"=>array("59315"=>3.5))
+    - 274=userid,59315=movieid,3.5=rating given by userid 274 to movieid 59315 
 
 For **ITEM BASED COLLABORATIVE FILTERING** each item of data matrix will be in the format:
-- array("59315"=>array("274"=>3.5))
-- 59315=movieid,274=userid,3.5=rating given to movieid 59315 by userid 274
+
+    array("59315"=>array("274"=>3.5))
+    - 59315=movieid,274=userid,3.5=rating given to movieid 59315 by userid 274
+
+#### Construct data matrix
 
     $dataMatrix=array();  
     //load ratings csv file  
@@ -45,8 +49,8 @@ For **ITEM BASED COLLABORATIVE FILTERING** each item of data matrix will be in t
     fgetcsv($fp);  
     //start constructing dataMatrix  
     //read till end of file  
-    while(($row=fgetcsv($fp))!==FALSE){  
-        //$row[0]=userid,$row[1]=movieid,$row[2]=rating  
+    while(($row=fgetcsv($fp))!==FALSE){
+       //$row[0]=userid,$row[1]=movieid,$row[2]=rating  
         //we will first check if our dataMatrix dont have a key=userid  
         $matrixKey="".$row[0].""; //for item based collaborative filtering this will be $row[1]  
         $itemKey="".$row[1].""; //for item based collaborative filtering this will be $row[0]  
@@ -74,10 +78,10 @@ For **ITEM BASED COLLABORATIVE FILTERING** each item of data matrix will be in t
             foreach ($keys as $k){  
                 if (!isset($dataMatrix[$k][$mkey])){  
                     $dataMatrix[$k][$mkey]=0;  
-                }  
+                }     
             }  
         }  
-    }  
+    }
     unset($movieIds);  
     fclose($fp);
 
