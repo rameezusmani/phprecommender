@@ -24,9 +24,9 @@ class RecommenderSystem {
     public function pivotDataMatrix(){
         $newMatrix=array();
         $keys=array_keys($this->dataMatrix);
-        foreach ($keys as $k){
-            $items=$this->dataMatrix[$k];
-            $ikeys=array_keys($items);
+        $items=$this->dataMatrix[$keys[0]];
+        $ikeys=array_keys($items);
+        foreach ($keys as $k){    
             foreach ($ikeys as $ik){
                 if (!isset($newMatrix[$ik])){
                     $newMatrix[$ik]=array();
@@ -36,12 +36,12 @@ class RecommenderSystem {
                 $newMatrix[$ik]["".$k.""]=$val;
             }
             unset($this->dataMatrix[$k]);
-            unset($ikeys);
-            unset($items);
         }
+        unset($ikeys);
+        unset($items);
         unset($keys);
         $this->dataMatrix=$newMatrix;
-        //return $newMatrix;
+        unset($newMatrix);
     }
 
     public function setUseWeightedDistance($wd){
@@ -55,6 +55,15 @@ class RecommenderSystem {
     public function setUnknownValue($v){
         $this->unknownValue=$v;
     }
+
+    private function isVectorEmpty($vector){
+        foreach ($vector as $v){
+            if ($v!=$this->unknownValue){
+                return false;
+            }
+        }
+        return true;
+    }    
 
     private function buildVectorFromDataMatrix($key){
         $vector=array();
@@ -87,8 +96,11 @@ class RecommenderSystem {
             if ($itemKey!="" && $this->dataMatrix[$k][$itemKey]==$this->unknownValue){
                 continue;
             }
-            $distance=0;
             $otherVector=$this->buildVectorFromDataMatrix($k);
+            if ($this->isVectorEmpty($otherVector)){
+                unset($otherVector);
+                continue;
+            }
             $distance=0;
             if ($method=="cosine"){
                 $distance=(1-DistanceCalculator::cosineOfAngle($subjectVector,$otherVector));
@@ -153,7 +165,7 @@ class RecommenderSystem {
         $neighbors_count=$max_neighbors;
         $neighbors=$this->getOrderedNeighbors($subjectKey,"",$max_neighbors);
         if (count($neighbors)<=0){
-            throw new NeighborsNotFoundException("No neighbors found");
+            throw new NeighborsNotFoundException();
         }
         if (count($neighbors)<$neighbors_count){
             $neighbors_count=count($neighbors);
@@ -188,6 +200,7 @@ class RecommenderSystem {
             $r['value']=floatval($r['value']/$r['count']);
             $recommendations[]=$r;
         }
+        unset($rated_movies);
         array_splice($recommendations,$max_count);
         return $recommendations;
     }
