@@ -38,52 +38,52 @@ For **ITEM BASED COLLABORATIVE FILTERING** each item of data matrix will be in t
 - array("59315"=>array("274"=>3.5))
 - 59315=movieid,274=userid,3.5=rating given to movieid 59315 by userid 274
 
-    $dataMatrix=array();
-    //load ratings csv file
-    $fp=fopen("ratings.csv","r");
-    //ignore first row because it is a header row
-    fgetcsv($fp);
-    //start constructing dataMatrix
-    //read till end of file
-    while(($row=fgetcsv($fp))!==FALSE){
-        //$row[0]=userid,$row[1]=movieid,$row[2]=rating
-        //we will first check if our dataMatrix dont have a key=userid
-        $matrixKey="".$row[0].""; //for item based collaborative filtering this will be $row[1]
-        $itemKey="".$row[1].""; //for item based collaborative filtering this will be $row[0]
-        if (!isset($dataMatrix[$matrixKey])){
-            //set row of matrix for this user id
-            $dataMatrix[$itemKey]=array();
-        }
-        //for user based collaborative filtering it will be $dataMatrix[userid][movieid]=rating
-        //for item based collaborative filtering it will be $dataMatrix[movieid][userid]=rating
-        $dataMatrix[$matrixKey][$itemKey]=floatval($row[2]);
-    }
-    fclose($fp);
-    //we have to normalize our dataset by setting unknown values (movies that are not rated by user x) to 0
-    //we are only using ratings.csv which has a lot of duplicates for each movieid
-    $movieIds=array();
-    //load ratings csv file
-    $fp=fopen("ratings.csv","r");
-    //ignore first row because it is a header row
-    fgetcsv($fp);
-    $keys=array_keys($dataMatrix);
-    while(($row=fgetcsv($fp))!==FALSE){
-        $mkey="".$row[1]."";
-        if (!in_array($mkey,$movieIds)){
-            $movieIds[]=$mkey;
-            foreach ($keys as $k){
-                if (!isset($dataMatrix[$k][$mkey])){
-                    $dataMatrix[$k][$mkey]=0;
-                }
-            }
-        }
-    }
-    unset($movieIds);
-    fclose($fp);
-    //create instance of RecommenderSystem and set parameters
-    $recommender=new RecommenderSystem();
-    $recommender->setDataMatrix($dataMatrix);
-    $recommender->setUnknownValue(0); //this tells RecommenderSystem that 0 is considered as unknown value
+    $dataMatrix=array();  
+    //load ratings csv file  
+    $fp=fopen("ratings.csv","r");  
+    //ignore first row because it is a header row  
+    fgetcsv($fp);  
+    //start constructing dataMatrix  
+    //read till end of file  
+    while(($row=fgetcsv($fp))!==FALSE){  
+        //$row[0]=userid,$row[1]=movieid,$row[2]=rating  
+        //we will first check if our dataMatrix dont have a key=userid  
+        $matrixKey="".$row[0].""; //for item based collaborative filtering this will be $row[1]  
+        $itemKey="".$row[1].""; //for item based collaborative filtering this will be $row[0]  
+        if (!isset($dataMatrix[$matrixKey])){  
+            //set row of matrix for this user id  
+            $dataMatrix[$itemKey]=array();  
+        }  
+        //for user based collaborative filtering it will be $dataMatrix[userid][movieid]=rating  
+        //for item based collaborative filtering it will be $dataMatrix[movieid][userid]=rating  
+        $dataMatrix[$matrixKey][$itemKey]=floatval($row[2]);  
+    }  
+    fclose($fp);  
+    //we have to normalize our dataset by setting unknown values (movies that are not rated by user x) to 0  
+    //we are only using ratings.csv which has a lot of duplicates for each movieid  
+    $movieIds=array();  
+    //load ratings csv file  
+    $fp=fopen("ratings.csv","r");  
+    //ignore first row because it is a header row  
+    fgetcsv($fp);  
+    $keys=array_keys($dataMatrix);  
+    while(($row=fgetcsv($fp))!==FALSE){  
+        $mkey="".$row[1]."";  
+        if (!in_array($mkey,$movieIds)){  
+            $movieIds[]=$mkey;  
+            foreach ($keys as $k){  
+                if (!isset($dataMatrix[$k][$mkey])){  
+                    $dataMatrix[$k][$mkey]=0;  
+                }  
+            }  
+        }  
+    }  
+    unset($movieIds);  
+    fclose($fp);  
+    //create instance of RecommenderSystem and set parameters  
+    $recommender=new RecommenderSystem();  
+    $recommender->setDataMatrix($dataMatrix);  
+    $recommender->setUnknownValue(0); //this tells RecommenderSystem that 0 is considered as unknown value  
 
 #### TASK#1: GET MOVIE RECOMMENDATONS FOR USER "448"
 
