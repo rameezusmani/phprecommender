@@ -16,6 +16,10 @@ class DataMatrix {
         $this->set_labels($y_labels,"y");
     }
 
+    public function get_dimensions(){
+        return [count($this->y_labels),count($this->x_labels)];
+    }
+
     public function get_row($idx){
         if (is_int($idx)){
             return $this->data[$idx];
@@ -102,18 +106,62 @@ class DataMatrix {
         $this->data[]=$row;
     }
 
+    public function transpose(){
+        $new_data=[];
+        for($i=0;$i<count($this->data);$i++){
+            $new_data[]=[];
+        }
+        for($i=0;$i<count($this->data);$i++){
+            for($j=0;$j<count($this->data[$i]);$j++){
+                $new_data[$j][]=$this->data[$i][$j];
+            }
+        }
+        unset($this->data);
+        $this->data=$new_data;
+        unset($new_data);
+        //swap labels
+        $v=$this->column_label;
+        $this->column_label=$this->row_label;
+        $this->row_label=$v;
+
+        //swap axis labels
+        $vals=$this->x_labels;
+        $this->x_labels=$this->y_labels;
+        unset($this->y_labels);
+        $this->y_labels=[];
+        foreach ($vals as $v){
+            $this->y_labels[]=$v;
+        }
+        unset($vals);
+    }
+
+    public function fillEmptyValues($empty_value=0){
+        for($i=0;$i<count($this->data);$i++){
+            for ($j=0;$j<count($this->x_labels);$j++){
+                if (!isset($this->data[$i][$j])){
+                    $this->data[$i][$j]=$empty_value;
+                }
+            }
+        }
+    }
+
+
+    // ---------------- PRINTING FUNCTIONS -----------------------------//
+    
     public function printHTML($max_records=10){
+        $dmns=$this->get_dimensions();
+        echo "<h3>".$dmns[0]." x ".$dmns[1]." MATRIX</h3>";
         echo "<table border='1' cellpadding='2' cellspacing='0'>";
         echo "<thead>";
         echo "<tr>";
-        echo "<th>".$this->column_label."</th>";
-        $x_cnt=count($this->x_labels);
-        foreach ($this->x_labels as $l){
-            echo "<th rowspan='2'>".$l."</th>";
-        }
+        echo "<th>".$this->row_label."</th>";
+        echo "<th style='text-align: left;' colspan='".count($this->x_labels)."'>".$this->column_label."</th>";
         echo "</tr>";
         echo "<tr>";
-        echo "<th>".$this->row_label."</th>";
+        echo "<th>&nbsp;</th>";
+        foreach ($this->x_labels as $l){
+            echo "<th>".$l."</th>";
+        }
         echo "</tr>";
         echo "</thead>";
         echo "<tbody>";
