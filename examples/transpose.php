@@ -2,8 +2,6 @@
 
 include "../src/autoload.php";
 
-use UglyRecommender\VectorsUnequalException;
-use UglyRecommender\NeighborsNotFoundException;
 use UglyRecommender\RecommenderSystem;
 use UglyRecommender\DataHelper\CsvLoadHelper;
 
