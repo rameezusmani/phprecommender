@@ -3,8 +3,8 @@
 namespace UglyRecommender;
 
 class DataMatrix {
-    public $row_label="";
-    public $column_label="";
+    public $row_label=""; //y axis label
+    public $column_label=""; //x axis label
 
     public $x_labels=[]; //these are labels/identifiers of each column
     public $y_labels=[]; //these are labels/identifiers of each row
@@ -25,7 +25,7 @@ class DataMatrix {
             return $this->data[$idx];
         }
         //its a label to y_labels
-        $idx=array_search($idx,$this->y_labels);
+        $idx=$this->get_label_index($idx,"y");
         if ($idx===FALSE){
             return FALSE;
         }
@@ -36,7 +36,7 @@ class DataMatrix {
         $column=[];
         if (!is_int($idx)){
             //its a label to x_labels
-            $idx=array_search($idx,$this->x_labels);
+            $idx=$this->get_label_index($idx,"x");
             if ($idx===FALSE){
                 return FALSE;
             }
