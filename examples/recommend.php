@@ -1,6 +1,6 @@
 <?php
 
-include "src/autoload.php";
+include "../src/autoload.php";
 
 use UglyRecommender\VectorsUnequalException;
 use UglyRecommender\NeighborsNotFoundException;
