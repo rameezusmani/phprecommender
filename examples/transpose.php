@@ -10,7 +10,7 @@ use UglyRecommender\DataHelper\CsvLoadHelper;
 $dataMatrix=CsvLoadHelper::load("../ratings.csv");
 $recommender=new RecommenderSystem();
 $recommender->setDataMatrix($dataMatrix);
-$recommender->pivotDataMatrix(); //transpose the data matrix*/
+$recommender->pivotDataMatrix(); //transpose the data matrix
 echo "Data Matrix tranposed";
 
 ?>
