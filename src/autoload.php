@@ -1,17 +1,19 @@
 <?php
 
 $uglyRecommenderClassMap=array();
-$uglyRecommenderClassMap["UglyRecommender\\DistanceCalculator"]="src/DistanceCalculator.php";
-$uglyRecommenderClassMap["UglyRecommender\\VectorsUnequalException"]="src/VectorsUnequalException.php";
-$uglyRecommenderClassMap["UglyRecommender\\RecommenderSystem"]="src/RecommenderSystem.php";
-$uglyRecommenderClassMap["UglyRecommender\\SubjectNotFoundException"]="src/SubjectNotFoundException.php";
-$uglyRecommenderClassMap["UglyRecommender\\NeighborsNotFoundException"]="src/NeighborsNotFoundException.php";
-$uglyRecommenderClassMap["UglyRecommender\\DataHelper\\CsvLoadHelper"]="src/datahelper/CsvLoadHelper.php";
+$uglyRecommenderClassMap["UglyRecommender\\DistanceCalculator"]="DistanceCalculator.php";
+$uglyRecommenderClassMap["UglyRecommender\\VectorsUnequalException"]="VectorsUnequalException.php";
+$uglyRecommenderClassMap["UglyRecommender\\RecommenderSystem"]="RecommenderSystem.php";
+$uglyRecommenderClassMap["UglyRecommender\\SubjectNotFoundException"]="SubjectNotFoundException.php";
+$uglyRecommenderClassMap["UglyRecommender\\NeighborsNotFoundException"]="NeighborsNotFoundException.php";
+$uglyRecommenderClassMap["UglyRecommender\\DataHelper\\CsvLoadHelper"]="datahelper/CsvLoadHelper.php";
 
 spl_autoload_register(function($class_name) {
     global $uglyRecommenderClassMap;
     if (isset($uglyRecommenderClassMap[$class_name])){
-        require_once($uglyRecommenderClassMap[$class_name]);
+        $class_filename=$uglyRecommenderClassMap[$class_name];
+        $include_path=dirname(__FILE__)."/".$class_filename;
+        require_once($include_path);
     } 
 });
 
