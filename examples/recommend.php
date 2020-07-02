@@ -1,5 +1,7 @@
 <?php
 
+set_time_limit(0);
+
 include "../src/autoload.php";
 
 use UglyRecommender\VectorsUnequalException;
@@ -8,8 +10,11 @@ use UglyRecommender\RecommenderSystem;
 use UglyRecommender\DataHelper\CsvLoadHelper;
 
 $dataMatrix=CsvLoadHelper::load("../ratings.csv");
+array_splice($dataMatrix,500); //reduce records for quick runtime
 $recommender=new RecommenderSystem();
 $recommender->setDataMatrix($dataMatrix);
+$recommender->setUnknownValue(0);
+$recommender->fillEmptyValues("x");
 //use cosine of angle....you can also use manhattan or euclidean as values
 $recommender->setDistanceMethod("cosine");
 //get recommendations for user 448, use 5 similar users to calculate and get maximum 5 recommendations

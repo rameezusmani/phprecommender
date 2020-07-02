@@ -2,6 +2,8 @@
 
 namespace UglyRecommender;
 
+use UglyRecommender\DataHelper\MatrixHelper;
+
 class RecommenderSystem {
     //main matrix to hold data
     //first column contains subject key
@@ -21,28 +23,25 @@ class RecommenderSystem {
         return $this->dataMatrix;
     }
 
-    public function pivotDataMatrix(){
-        $newMatrix=array();
-        $keys=array_keys($this->dataMatrix);
-        $items=$this->dataMatrix[$keys[0]];
-        $ikeys=array_keys($items);
-        foreach ($keys as $k){    
-            foreach ($ikeys as $ik){
-                if (!isset($newMatrix[$ik])){
-                    $newMatrix[$ik]=array();
+    public function fillEmptyValues($axis="x"){
+        $matrixHelper=new MatrixHelper();
+        $all_unique_keys=array();
+        //build unique subkeys
+        foreach($this->dataMatrix as $dm){
+            $keys=array_keys($dm);
+            foreach ($keys as $k){
+                if (!in_array($k,$all_unique_keys)){
+                    $all_unique_keys[]=$k;
                 }
-                $val=floatval($this->dataMatrix[$k][$ik]);
-                unset($this->dataMatrix[$k][$ik]);
-                $newMatrix[$ik]["".$k.""]=$val;
             }
-            unset($this->dataMatrix[$k]);
         }
-        unset($this->dataMatrix);
-        unset($ikeys);
-        unset($items);
-        unset($keys);
-        $this->dataMatrix=$newMatrix;
-        unset($newMatrix);
+        $matrixHelper->fillEmptyValues($this->dataMatrix,$all_unique_keys,$this->unknownValue,$axis);
+        unset($all_unique_keys);
+    }
+
+    public function pivotDataMatrix(){
+        $matrixHelper=new MatrixHelper();
+        $this->dataMatrix=$matrixHelper->pivotDataMatrix($this->dataMatrix);
     }
 
     public function setUseWeightedDistance($wd){
