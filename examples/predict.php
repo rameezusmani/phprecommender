@@ -2,20 +2,18 @@
 
 include "../src/autoload.php";
 
-use UglyRecommender\VectorsUnequalException;
-use UglyRecommender\NeighborsNotFoundException;
 use UglyRecommender\RecommenderSystem;
 use UglyRecommender\DataHelper\CsvLoadHelper;
 
-$dataMatrix=CsvLoadHelper::load("../ratings.csv");
+$dm=CsvLoadHelper::load("../ratings.csv");
+//fill missing values with 0 to make matrix correct dimension
+$dm->fillMissingValues(0);
 $recommender=new RecommenderSystem();
-$recommender->setDataMatrix($dataMatrix);
-//use cosine of angle....you can also use manhattan or euclidean as values
+$recommender->setDataMatrix($dm);
 $recommender->setDistanceMethod("cosine");
-//predict rating to be given by "448" to movie "5"
+//predict rating to be given by "4" to movie "47"
 //use maximum 100 neighbors to predict
-$value=$recommender->predictValue("448","5",100);
-echo "<br />";
-echo "USER 448 IS EXPECTED TO GIVE ".$value." RATING TO MOVIE 5<br />";
+$value=$recommender->predict("4","47",100);
+echo $value;
 
 ?>

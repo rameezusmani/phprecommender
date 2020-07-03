@@ -2,70 +2,52 @@
 
 namespace UglyRecommender;
 
-class DataMatrix {
+use UglyRecommender\Matrix;
+
+class DataMatrix extends Matrix {
     public $row_label=""; //y axis label
     public $column_label=""; //x axis label
 
     public $x_labels=[]; //these are labels/identifiers of each column
     public $y_labels=[]; //these are labels/identifiers of each row
-    public $data=[]; //2d array of values like a matrix
-
+    
     public function __construct($data_rows=[],$x_labels=[],$y_labels=[]){
-        $this->set_matrix($data_rows);
+        parent::__construct($data_rows);
         $this->set_labels($x_labels,"x");
         $this->set_labels($y_labels,"y");
     }
 
-    public function get_dimensions(){
-        return [count($this->y_labels),count($this->x_labels)];
-    }
-
     public function get_value($i,$j){
         if (is_int($i) && is_int($j)){
-            return $this->dataMatrix[$i][$j];
+            return parent::get_value($i,$j);
         }
-        return $this->_get_value_from_row($this->get_row($i),$j);
+        return $this->get_value_from_row($this->get_row($i),$j);
     }
 
     public function get_value_from_row($row,$j){
+        if (is_int($j)){
+            return parent::get_value_from_row($row,$j);
+        }
         return $this->_get_value_from_row($row,$j);
     }
 
     private function _get_value_from_row($row,$j){
-        if (is_int($j)){
-            return $row[$j];
-        }
         $idx=$this->get_label_index($j);
-        if ($idx===FALSE)
-            return FALSE;
-        return $row[$idx];
+        return ($idx===FALSE)?FALSE:parent::get_value_from_row($row,$idx);
     }
 
     public function get_row($idx){
-        if (is_int($idx)){
-            return $this->data[$idx];
+        if (!is_int($idx)){
+            $idx=$this->get_label_index($idx,"y");
         }
-        //its a label to y_labels
-        $idx=$this->get_label_index($idx,"y");
-        if ($idx===FALSE){
-            return FALSE;
-        }
-        return $this->data[$idx];
+        return ($idx===FALSE)?FALSE:parent::get_row($idx);
     }
 
     public function get_column($idx){
-        $column=[];
         if (!is_int($idx)){
-            //its a label to x_labels
             $idx=$this->get_label_index($idx,"x");
-            if ($idx===FALSE){
-                return FALSE;
-            }
         }
-        foreach ($this->data as $d){
-            $column[]=$d[$idx];
-        }
-        return $column;
+        return ($idx===FALSE)?FALSE:parent::get_column($idx);
     }
 
     public function get_label_index($l,$axis="x"){
@@ -107,40 +89,6 @@ class DataMatrix {
         }
     }
 
-    public function clear_matrix(){
-        unset($this->data);
-        $this->data=[];
-    }
-
-    public function set_matrix($mat){
-        unset($this->data);
-        $this->data=[];
-        $this->append_matrix($mat);
-    }
-
-    public function append_matrix($mat){
-        foreach ($mat as $m){
-            $this->append_row($m);
-        }
-    }
-
-    public function append_row($row){
-        $this->data[]=$row;
-    }
-
-    private function _transposeMatrix(){
-        $new_data=[];
-        for($i=0;$i<count($this->data);$i++){
-            $new_data[]=[];
-        }
-        for($i=0;$i<count($this->data);$i++){
-            for($j=0;$j<count($this->data[$i]);$j++){
-                $new_data[$j][]=$this->data[$i][$j];
-            }
-        }
-        $this->data=$new_data;
-    }
-
     private function _swapLabels(){
         //swap labels
         $v=$this->column_label;
@@ -157,11 +105,11 @@ class DataMatrix {
     }
 
     public function transpose(){
-        $this->_transposeMatrix();
+        parent::transpose();
         $this->_swapLabels();
     }
 
-    public function fillEmptyValues($empty_value=0){
+    public function fillMissingValues($empty_value=0){
         for($i=0;$i<count($this->data);$i++){
             for ($j=0;$j<count($this->x_labels);$j++){
                 if (!isset($this->data[$i][$j])){
