@@ -61,15 +61,49 @@ class Matrix {
 
     public function transpose(){
         $new_data=[];
-        for($i=0;$i<count($this->data);$i++){
+        $num_rows=count($this->data);
+        for($i=0;$i<$num_rows;$i++){
             $new_data[]=[];
         }
-        for($i=0;$i<count($this->data);$i++){
-            for($j=0;$j<count($this->data[$i]);$j++){
+        for($i=0;$i<$num_rows;$i++){
+            $num_cols=count($this->data[$i]);
+            for($j=0;$j<$num_cols;$j++){
                 $new_data[$j][]=$this->data[$i][$j];
             }
         }
         $this->data=$new_data;
+    }
+
+    protected function _get_vector_length($vector,$algo='l1'){
+        $len=1;
+        if ($algo=='l1'){
+            $len=0;
+            foreach ($vector as $v){
+                $len+=abs($v);
+            }
+        }else if ($algo=='l2'){
+            $len=0;
+            foreach ($vector as $v){
+                $len+=pow($v,2);
+            }
+            $len=sqrt($len);
+        }else if ($algo=='max'){
+            $len=max($vector);
+        }
+        return $len;
+    }
+
+    //l1, l2 or max can be used as algo
+    public function normalize($algo='l1'){
+        $num_rows=count($this->data);
+        for ($i=0;$i<$num_rows;$i++){
+            $vlen=$this->_get_vector_length($this->data[$i],$algo);
+            $num_cols=count($this->data[$i]);
+            for ($j=0;$j<$num_cols;$j++){
+                $v=$this->data[$i][$j];
+                $this->data[$i][$j]=$v/$vlen;
+            }
+        }
     }
 }
 
