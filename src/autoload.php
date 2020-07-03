@@ -8,6 +8,7 @@ $uglyRecommenderClassMap["UglyRecommender\\SubjectNotFoundException"]="SubjectNo
 $uglyRecommenderClassMap["UglyRecommender\\NeighborsNotFoundException"]="NeighborsNotFoundException.php";
 $uglyRecommenderClassMap["UglyRecommender\\DataHelper\\CsvLoadHelper"]="datahelper/CsvLoadHelper.php";
 $uglyRecommenderClassMap["UglyRecommender\\DataHelper\\MatrixHelper"]="datahelper/MatrixHelper.php";
+$uglyRecommenderClassMap["UglyRecommender\\Matrix"]="Matrix.php";
 $uglyRecommenderClassMap["UglyRecommender\\DataMatrix"]="DataMatrix.php";
 
 spl_autoload_register(function($class_name) {

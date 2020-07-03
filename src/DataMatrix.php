@@ -20,6 +20,27 @@ class DataMatrix {
         return [count($this->y_labels),count($this->x_labels)];
     }
 
+    public function get_value($i,$j){
+        if (is_int($i) && is_int($j)){
+            return $this->dataMatrix[$i][$j];
+        }
+        return $this->_get_value_from_row($this->get_row($i),$j);
+    }
+
+    public function get_value_from_row($row,$j){
+        return $this->_get_value_from_row($row,$j);
+    }
+
+    private function _get_value_from_row($row,$j){
+        if (is_int($j)){
+            return $row[$j];
+        }
+        $idx=$this->get_label_index($j);
+        if ($idx===FALSE)
+            return FALSE;
+        return $row[$idx];
+    }
+
     public function get_row($idx){
         if (is_int($idx)){
             return $this->data[$idx];
@@ -86,8 +107,9 @@ class DataMatrix {
         }
     }
 
-    public function clear_matrix($mat){
+    public function clear_matrix(){
         unset($this->data);
+        $this->data=[];
     }
 
     public function set_matrix($mat){
@@ -98,15 +120,15 @@ class DataMatrix {
 
     public function append_matrix($mat){
         foreach ($mat as $m){
-            $this->add_row($m);
+            $this->append_row($m);
         }
     }
 
-    public function add_row($row){
+    public function append_row($row){
         $this->data[]=$row;
     }
 
-    public function transpose(){
+    private function _transposeMatrix(){
         $new_data=[];
         for($i=0;$i<count($this->data);$i++){
             $new_data[]=[];
@@ -116,9 +138,10 @@ class DataMatrix {
                 $new_data[$j][]=$this->data[$i][$j];
             }
         }
-        unset($this->data);
         $this->data=$new_data;
-        unset($new_data);
+    }
+
+    private function _swapLabels(){
         //swap labels
         $v=$this->column_label;
         $this->column_label=$this->row_label;
@@ -127,12 +150,15 @@ class DataMatrix {
         //swap axis labels
         $vals=$this->x_labels;
         $this->x_labels=$this->y_labels;
-        unset($this->y_labels);
         $this->y_labels=[];
         foreach ($vals as $v){
             $this->y_labels[]=$v;
         }
-        unset($vals);
+    }
+
+    public function transpose(){
+        $this->_transposeMatrix();
+        $this->_swapLabels();
     }
 
     public function fillEmptyValues($empty_value=0){
@@ -148,19 +174,28 @@ class DataMatrix {
 
     // ---------------- PRINTING FUNCTIONS -----------------------------//
     
-    public function printHTML($max_records=10){
+    public function printHTML($max_records=10,$max_cols=10){
         $dmns=$this->get_dimensions();
+        $total_x_cols=count($this->x_labels);
+        if ($max_cols!=-1 && $total_x_cols>$max_cols){
+            $total_x_cols=$max_cols;
+        }
         echo "<h3>".$dmns[0]." x ".$dmns[1]." MATRIX</h3>";
         echo "<table border='1' cellpadding='2' cellspacing='0'>";
         echo "<thead>";
         echo "<tr>";
         echo "<th>".$this->row_label."</th>";
-        echo "<th style='text-align: left;' colspan='".count($this->x_labels)."'>".$this->column_label."</th>";
+        echo "<th style='text-align: left;' colspan='".$total_x_cols."'>".$this->column_label."</th>";
         echo "</tr>";
         echo "<tr>";
         echo "<th>&nbsp;</th>";
+        $cnt=0;
         foreach ($this->x_labels as $l){
+            if ($cnt==$total_x_cols){
+                break;
+            }
             echo "<th>".$l."</th>";
+            $cnt++;
         }
         echo "</tr>";
         echo "</thead>";
@@ -174,6 +209,9 @@ class DataMatrix {
             echo "<th>".$l."</th>";
             $c_cnt=0;
             foreach($this->x_labels as $l){
+                if ($max_cols!=-1 && $c_cnt==$max_cols){
+                    break;
+                }
                 echo "<td style='text-align: center;'>";
                 echo isset($this->data[$cnt][$c_cnt])?$this->data[$cnt][$c_cnt]:"";
                 echo "</td>";
