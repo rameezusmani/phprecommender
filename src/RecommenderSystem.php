@@ -6,7 +6,6 @@ use UglyRecommender\DataHelper\MatrixHelper;
 
 class RecommenderSystem {
     private $dataMatrix=array();
-    private $useWeightedDistance=false;
     private $distanceMethod="cosine";
     private $unknownValue=0;
 
@@ -16,10 +15,6 @@ class RecommenderSystem {
 
     public function getDataMatrix(){
         return $this->dataMatrix;
-    }
-
-    public function setUseWeightedDistance($wd){
-        $this->useWeightedDistance=$wd;
     }
 
     public function setDistanceMethod($m){
@@ -103,19 +98,27 @@ class RecommenderSystem {
         return $neighbors;
     }
 
-    public function predict($y_label,$x_label,$max_neighbors=5){
+    public function predict($y_label,$x_label,$max_neighbors=5,$weights=[]){
         $neighbors_count=$max_neighbors;
+        $use_weights=count($weights)>0;
         $neighbors=$this->getNearestNeighbors($y_label,$x_label,$max_neighbors);
         $value=0;
         if (count($neighbors)<=0){
             throw new NeighborsNotFoundException("No neighbors found");
         }
         $total_weights=1;
+        $n_index=0;
         foreach ($neighbors as $n){
             $nval=$this->dataMatrix->get_value($n["key"],$x_label);
             $nweight=1;
+            if ($use_weights){
+                if (isset($weights[$n_index])){
+                    $nweight=$weights[$n_index];
+                }
+            }
             $value+=floatval($nval)*$nweight;
             $total_weights+=$nweight;
+            $n_index++;
         }
         $value=$value/$total_weights;
         unset($neighbors);

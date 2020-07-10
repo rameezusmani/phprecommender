@@ -64,6 +64,11 @@ filled with values from "ratings.csv"
     //use maximum 100 neighbors to predict
     $value=$recommender->predict("448","5",100);
 
+#### PREDICT RATING TO BE GIVEN BY USER "448" to MOVIE "5" using weighted neighbors
+
+    //use maximum 100 neighbors to predict and use weights for nearest 10 neighbors
+    $value=$recommender->predict("448","5",100,[1.3,1.8,1.7,1.4,1.2,1.1,1.05,1.12,1.13]);
+
 
 #### GET MAXIMUM 15 USERS SIMILAR TO USER 448
 
